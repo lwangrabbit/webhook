@@ -1,13 +1,22 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 )
 
+const DefaultPort = 5000
+
 func main() {
+	// 定义命令行参数
+	listenAddr := flag.String("addr", fmt.Sprintf(":%v", DefaultPort), "address to listen on")
+	// 解析命令行参数
+	flag.Parse()
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost && r.URL.Path == "/" {
 			body, err := ioutil.ReadAll(r.Body)
@@ -28,6 +37,6 @@ func main() {
 		}
 	})
 
-	fmt.Println("Server started, listening on port 5000")
-	http.ListenAndServe(":5000", nil)
+	fmt.Println("Server started, listening on port ", strings.Split(*listenAddr, ":")[1])
+	http.ListenAndServe(*listenAddr, nil)
 }
